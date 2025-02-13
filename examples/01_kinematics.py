@@ -2,7 +2,7 @@
 Tests robot forward + inverse kinematics using JaxMP.
 """
 
-from typing import Literal, Optional
+from typing import Literal, Optional, cast
 from pathlib import Path
 import time
 from loguru import logger
@@ -271,7 +271,8 @@ def main(
         for target_joint_idx in target_joint_indices:
             manip_cost += RobotFactors.manip_yoshikawa(kin, joints, target_joint_idx)
         manip_cost /= len(target_joint_indices)
-        manipulability_cost_handler.value = onp.array(manip_cost).item()
+        manip_cost = cast(float, onp.array(manip_cost).item())
+        manipulability_cost_handler.value = manip_cost
 
 
 if __name__ == "__main__":

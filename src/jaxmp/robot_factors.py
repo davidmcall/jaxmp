@@ -285,9 +285,11 @@ class RobotFactors:
             self_coll_cost,
             (
                 JointVarType(jnp.repeat(var_idx, num_coll_factors)),
-                None
-                if prev_var_idx is None
-                else JointVarType(jnp.repeat(prev_var_idx, num_coll_factors)),
+                (
+                    None
+                    if prev_var_idx is None
+                    else JointVarType(jnp.repeat(prev_var_idx, num_coll_factors))
+                ),
                 jnp.tile(activation_dist, num_vars),
                 jnp.tile(weights, num_vars),
                 jnp.tile(indices_0, (num_vars, 1)),
@@ -367,9 +369,11 @@ class RobotFactors:
             world_coll_cost,
             (
                 JointVarType(jnp.repeat(var_idx, num_coll_factors)),
-                None
-                if prev_var_idx is None
-                else JointVarType(jnp.repeat(prev_var_idx, num_coll_factors)),
+                (
+                    None
+                    if prev_var_idx is None
+                    else JointVarType(jnp.repeat(prev_var_idx, num_coll_factors))
+                ),
                 jnp.tile(activation_dist, num_vars),
                 jnp.tile(weights, num_vars),
                 jnp.tile(coll_indices, (num_vars, 1)),
@@ -439,12 +443,18 @@ class RobotFactors:
     def manip_yoshikawa(
         kin: JaxKinTree,
         cfg: Array,
-        target_joint_idx: jax.Array,
+        target_joint_idx: jax.Array | int,
     ) -> Array:
         """Manipulability, as the determinant of the Jacobian."""
         jacobian = jax.jacfwd(
             lambda cfg: jaxlie.SE3(kin.forward_kinematics(cfg)).translation()
         )(cfg)
+        if isinstance(target_joint_idx, int):
+            target_joint_idx = jnp.array([target_joint_idx])
+        elif (
+            isinstance(target_joint_idx, jax.Array) and len(target_joint_idx.shape) == 0
+        ):
+            target_joint_idx = jnp.array([target_joint_idx])
         assert target_joint_idx.shape == (1,)
         jacobian = jacobian[target_joint_idx].squeeze()
         assert jacobian.shape == (3, kin.num_actuated_joints)
