@@ -235,8 +235,6 @@ class RobotFactors:
             coll_0 = colls.slice(..., indices_0)
             coll_1 = colls.slice(..., indices_1)
 
-            sdf = collide(coll_0, coll_1).dist
-
             if var_prev is not None:
                 assert isinstance(coll_0, Sphere)
                 assert isinstance(coll_1, Sphere)
@@ -248,6 +246,7 @@ class RobotFactors:
                 coll_0 = Capsule.from_sphere_pairs(prev_coll_0, coll_0)
                 coll_1 = Capsule.from_sphere_pairs(prev_coll_1, coll_1)
 
+            sdf = collide(coll_0.reshape(-1, 1), coll_1.reshape(1, -1)).dist
             return (
                 colldist_from_sdf(sdf, activation_dist=activation_dist) * weights
             ).flatten()
@@ -340,7 +339,7 @@ class RobotFactors:
                 prev_coll = prev_coll.slice(..., coll_indices).transform(base_tf)
                 coll = Capsule.from_sphere_pairs(prev_coll, coll)
 
-            sdf = collide(coll, other).dist
+            sdf = collide(coll.reshape(-1, 1), other.reshape(1, -1)).dist
             return (colldist_from_sdf(sdf, activation_dist=eta) * weights).flatten()
 
         assert isinstance(robot_coll.coll, CollGeom)
