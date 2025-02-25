@@ -1,5 +1,9 @@
 # jaxmp
 
+👀 work in progress! many changes planned. 
+
+---
+
 JAX-based robot library, focusing on modularity and ease of use.
 
 We formulate goals and tasks as a nonlinear least squares problem, and use [jaxls](https://github.com/brentyi/jaxls) to solve it in a sparse manner.
