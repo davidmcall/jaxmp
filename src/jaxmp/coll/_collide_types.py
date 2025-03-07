@@ -10,17 +10,18 @@ from __future__ import annotations
 import abc
 from typing import cast
 
-import trimesh
-import scipy
 import jax
 import numpy as onp
 import jax.numpy as jnp
-import jaxlie
-from jaxtyping import Float
 import jax_dataclasses as jdc
+import jaxlie
+import numpy as onp
+import scipy
+import trimesh
+from jaxtyping import Float
 
-from mujoco.mjx._src.types import ConvexMesh
 from mujoco.mjx._src.mesh import _get_face_norm, _get_edge_normals
+from mujoco.mjx._src.types import ConvexMesh
 
 
 def make_frame(direction: jax.Array) -> jax.Array:
@@ -85,8 +86,8 @@ class CollGeom(abc.ABC):
 
     def slice(self, *index):
         with jdc.copy_and_mutate(self, validate=False) as _self:
-            _self.pose = jaxlie.SE3(_self.pose.wxyz_xyz[*index, :])
-            _self.size = self.size[*index, :]
+            _self.pose = jaxlie.SE3(_self.pose.wxyz_xyz.__getitem__((*index, slice()))) #type: ignore
+            _self.size = self.size.__getitem__((*index, slice())) #type: ignore
         return _self
 
     def to_trimesh(self) -> trimesh.Trimesh:
